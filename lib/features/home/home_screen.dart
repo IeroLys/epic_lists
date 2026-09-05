@@ -84,7 +84,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ),
             ),
             const SizedBox(width: 10),
-            Text('EPIC LISTS', style: AppTheme.pixelTitle(color: context.pxFg)),
+            Text('EPIC FLAGS', style: AppTheme.pixelTitle(color: context.pxFg)),
           ],
         ),
         actions: [

@@ -25,10 +25,7 @@ class _EpicFormScreenState extends State<EpicFormScreen> {
 
   bool get isEditing => widget.epic != null;
 
-  static const _quickEmojis = [
-    '🚩', '⚑', '⚐', '🏁', '⚡', '🔥', '💡', '🎯',
-    '🚀', '⭐', '💪', '📚', '🧠', '🛠️', '✅', '📌',
-  ];
+
 
   @override
   void initState() {
@@ -163,14 +160,10 @@ class _EpicFormScreenState extends State<EpicFormScreen> {
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        if (_emojiCtrl.text.trim().isNotEmpty) ...[
-                          Text(
-                            _emojiCtrl.text.trim(),
-                            style: const TextStyle(fontSize: 40),
-                          ),
-                          const SizedBox(width: 12),
-                        ],
-                        PixelFlag(color: _color, size: 56),
+                        if (_emojiCtrl.text.trim().isNotEmpty)
+                          Text(_emojiCtrl.text.trim(), style: const TextStyle(fontSize: 48))
+                        else
+                          PixelFlag(color: _color, size: 56),
                       ],
                     ),
                     const SizedBox(height: 8),
@@ -188,23 +181,6 @@ class _EpicFormScreenState extends State<EpicFormScreen> {
             Text(
               'Эмодзи (необязательно)',
               style: Theme.of(context).textTheme.titleSmall,
-            ),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: _quickEmojis.map((e) {
-                final selected = _emojiCtrl.text.trim() == e;
-                return ChoiceChip(
-                  label: Text(e, style: const TextStyle(fontSize: 20)),
-                  selected: selected,
-                  onSelected: (_) {
-                    setState(() {
-                      _emojiCtrl.text = selected ? '' : e;
-                    });
-                  },
-                );
-              }).toList(),
             ),
             const SizedBox(height: 12),
             TextFormField(

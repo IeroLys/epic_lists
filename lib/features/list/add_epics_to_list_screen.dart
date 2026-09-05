@@ -13,7 +13,6 @@ class AddEpicsToListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final provider = context.watch<AppProvider>();
     final allEpics = provider.epics;
-    // Re-fetch current list state
     final currentList = provider.lists.firstWhere(
       (l) => l.id == list.id,
       orElse: () => list,
@@ -42,42 +41,61 @@ class AddEpicsToListScreen extends StatelessWidget {
                 final isInList = currentIds.contains(epic.id);
                 final isDone = epic.isCompleted;
 
+                final titleStyle = TextStyle(
+                  fontWeight: FontWeight.w600,
+                  decoration: isDone ? TextDecoration.lineThrough : null,
+                  color: isDone ? Colors.green.shade600 : null,
+                );
+
+                final subtitleStyle = TextStyle(
+                  decoration: isDone ? TextDecoration.lineThrough : null,
+                  color: isDone
+                      ? Colors.green.shade400.withOpacity(0.8)
+                      : Theme.of(context)
+                          .textTheme
+                          .bodyMedium
+                          ?.color
+                          ?.withOpacity(0.7),
+                );
+
                 return Card(
-                  child: ListTile(
-                    leading: Row(
-                      mainAxisSize: MainAxisSize.min,
+                  margin: const EdgeInsets.symmetric(vertical: 4),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         if (epic.emoji != null && epic.emoji!.isNotEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(right: 6),
-                            child: Text(
-                              epic.emoji!,
-                              style: const TextStyle(fontSize: 20),
-                            ),
+                          Text(epic.emoji!, style: const TextStyle(fontSize: 28))
+                        else
+                          Opacity(
+                            opacity: isDone ? 0.5 : 1,
+                            child: PixelFlag(color: epic.color, size: 28),
                           ),
-                        Opacity(
-                          opacity: isDone ? 0.5 : 1,
-                          child: PixelFlag(color: epic.color, size: 26),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(epic.title, style: titleStyle),
+                              if (epic.description.isNotEmpty) ...[
+                                const SizedBox(height: 2),
+                                Text(
+                                  epic.description,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: subtitleStyle,
+                                ),
+                              ],
+                            ],
+                          ),
                         ),
-                      ],
-                    ),
-                    title: Text(
-                      epic.title,
-                      style: TextStyle(
-                        decoration:
-                            isDone ? TextDecoration.lineThrough : null,
-                        color: isDone ? Colors.green.shade600 : null,
-                      ),
-                    ),
-                    subtitle: epic.description.isNotEmpty
-                        ? Text(
-                            epic.description,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          )
-                        : null,
-                    trailing: isInList
-                        ? IconButton(
+                        if (isInList)
+                          IconButton(
                             icon: const Icon(
                               Icons.check_circle_rounded,
                               color: Colors.green,
@@ -87,13 +105,16 @@ class AddEpicsToListScreen extends StatelessWidget {
                               provider.removeEpicFromList(list.id, epic.id);
                             },
                           )
-                        : IconButton(
+                        else
+                          IconButton(
                             icon: const Icon(Icons.add_circle_outline_rounded),
                             tooltip: 'Добавить в список',
                             onPressed: () {
                               provider.addEpicToList(list.id, epic.id);
                             },
                           ),
+                      ],
+                    ),
                   ),
                 );
               },

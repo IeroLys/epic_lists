@@ -344,20 +344,12 @@ class _EpicTile extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 4),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        leading: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (epic.emoji != null && epic.emoji!.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(right: 6),
-                child: Text(epic.emoji!, style: const TextStyle(fontSize: 22)),
-              ),
-            Opacity(
-              opacity: isDone ? 0.5 : 1,
-              child: PixelFlag(color: epic.color, size: 28),
-            ),
-          ],
-        ),
+        leading: epic.emoji != null && epic.emoji!.isNotEmpty
+    ? Text(epic.emoji!, style: const TextStyle(fontSize: 28))
+    : Opacity(
+        opacity: isDone ? 0.5 : 1,
+        child: PixelFlag(color: epic.color, size: 28),
+      ),
         title: Text(epic.title, style: titleStyle),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

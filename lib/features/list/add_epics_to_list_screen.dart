@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../core/providers/app_provider.dart';
 import '../../core/theme/app_theme.dart';
 import '../../data/models/display_list.dart';
@@ -19,13 +20,22 @@ class AddEpicsToListScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: context.pxBg,
       appBar: AppBar(
-        title: Text('В «${list.name}»', style: AppTheme.pixelTitle(color: context.pxFg, size: 10)),
+        // Используем перевод с аргументом (название списка)
+        title: Text(
+          'add_to_list'.tr(args: [list.name]), 
+          style: AppTheme.pixelTitle(color: context.pxFg, size: 10),
+        ),
       ),
       body: allEpics.isEmpty
           ? Center(
               child: Padding(
                 padding: const EdgeInsets.all(24),
-                child: Text('Пока нет ни одного эпика.\nСначала создай эпик кнопкой «+ ЭПИК».', textAlign: TextAlign.center, style: AppTheme.body(color: context.pxMuted)),
+                // Используем готовый ключ перевода для пустого состояния
+                child: Text(
+                  'no_epics_yet'.tr(), 
+                  textAlign: TextAlign.center, 
+                  style: AppTheme.body(color: context.pxMuted),
+                ),
               ),
             )
           : ListView.builder(

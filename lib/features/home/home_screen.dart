@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../core/providers/app_provider.dart';
 import '../../core/providers/theme_provider.dart';
 import '../../core/theme/app_theme.dart';
@@ -84,10 +85,44 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ),
             ),
             const SizedBox(width: 10),
-            Text('EPIC FLAGS', style: AppTheme.pixelTitle(color: context.pxFg)),
+            Text('app_title'.tr(), style: AppTheme.pixelTitle(color: context.pxFg)),
           ],
         ),
         actions: [
+          // Кнопка смены языка
+          Container(
+            margin: const EdgeInsets.only(right: 6),
+            decoration: BoxDecoration(
+              border: Border.all(color: context.pxLine, width: 2),
+              boxShadow: [
+                BoxShadow(
+                  color: context.isDark ? Colors.black : const Color(0x33000000),
+                  offset: const Offset(2, 2),
+                ),
+              ],
+            ),
+            child: Material(
+              color: context.pxPanel,
+              child: InkWell(
+                onTap: () {
+                  final newLocale = context.locale.languageCode == 'ru'
+                      ? const Locale('en')
+                      : const Locale('ru');
+                  context.setLocale(newLocale);
+                },
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  alignment: Alignment.center,
+                  child: Text(
+                    context.locale.languageCode == 'ru' ? 'EN' : 'RU',
+                    style: AppTheme.pixelSmall(size: 7, color: context.pxMuted),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          // Кнопка смены темы
           Container(
             margin: const EdgeInsets.only(right: 6),
             decoration: BoxDecoration(
@@ -112,6 +147,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ),
             ),
           ),
+          // Кнопка управления списками
           Container(
             margin: const EdgeInsets.only(right: 12),
             decoration: BoxDecoration(
@@ -179,11 +215,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           },
           icon: const Icon(Icons.add_rounded, size: 16),
           label: Text(
-  'ЭПИК',
-  style: AppTheme.pixelSmall(
-    color: context.isDark ? const Color(0xFFF0C9A8) : AppTheme.accentDim,
-  ),
-),
+            'epic'.tr(),
+            style: AppTheme.pixelSmall(
+              color: context.isDark ? const Color(0xFFF0C9A8) : AppTheme.accentDim,
+            ),
+          ),
         ),
       ),
     );
@@ -210,11 +246,11 @@ class _EpicListView extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
-                _FilterChip(label: 'АКТИВНЫЕ', selected: filter == EpicFilter.active, onTap: () => provider.setFilter(EpicFilter.active)),
+                _FilterChip(label: 'active'.tr(), selected: filter == EpicFilter.active, onTap: () => provider.setFilter(EpicFilter.active)),
                 const SizedBox(width: 8),
-                _FilterChip(label: 'ВЫПОЛНЕННЫЕ', selected: filter == EpicFilter.completed, onTap: () => provider.setFilter(EpicFilter.completed)),
+                _FilterChip(label: 'completed'.tr(), selected: filter == EpicFilter.completed, onTap: () => provider.setFilter(EpicFilter.completed)),
                 const SizedBox(width: 8),
-                _FilterChip(label: 'ВСЕ', selected: filter == EpicFilter.all, onTap: () => provider.setFilter(EpicFilter.all)),
+                _FilterChip(label: 'all'.tr(), selected: filter == EpicFilter.all, onTap: () => provider.setFilter(EpicFilter.all)),
               ],
             ),
           ),
@@ -224,11 +260,14 @@ class _EpicListView extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
             child: Row(
               children: [
-                Text('${epics.length} ${_pluralEpics(epics.length)}', style: AppTheme.body(size: 12, color: context.pxSubtle)),
+                Text(
+                  'epics_count'.plural(epics.length, args: [epics.length.toString()]),
+                  style: AppTheme.body(size: 12, color: context.pxSubtle),
+                ),
                 const Spacer(),
                 TextButton(
                   onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => AddEpicsToListScreen(list: list))),
-                  child: const Text('+ Добавить', style: TextStyle(fontSize: 12)),
+                  child: Text('+ ${'add'.tr()}', style: const TextStyle(fontSize: 12)),
                 ),
               ],
             ),
@@ -245,12 +284,6 @@ class _EpicListView extends StatelessWidget {
         ),
       ],
     );
-  }
-
-  String _pluralEpics(int n) {
-    if (n % 10 == 1 && n % 100 != 11) return 'эпик';
-    if (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) return 'эпика';
-    return 'эпиков';
   }
 }
 
@@ -290,9 +323,9 @@ class _EmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final message = switch (filter) {
-      EpicFilter.active => 'Нет активных эпиков',
-      EpicFilter.completed => 'Нет выполненных эпиков',
-      EpicFilter.all => 'Список пуст',
+      EpicFilter.active => 'no_active_epics'.tr(),
+      EpicFilter.completed => 'no_completed_epics'.tr(),
+      EpicFilter.all => 'list_empty'.tr(),
     };
 
     return Center(
@@ -305,14 +338,14 @@ class _EmptyState extends StatelessWidget {
             const SizedBox(height: 16),
             Text(message, style: AppTheme.pixelSmall(color: context.pxSubtle), textAlign: TextAlign.center),
             const SizedBox(height: 8),
-            Text('Добавь эпики в этот список', style: AppTheme.body(size: 13, color: context.pxSubtle), textAlign: TextAlign.center),
+            Text('add_epics_to_list'.tr(), style: AppTheme.body(size: 13, color: context.pxSubtle), textAlign: TextAlign.center),
             if (filter == EpicFilter.all || filter == EpicFilter.active) ...[
               const SizedBox(height: 24),
               Container(
                 decoration: BoxDecoration(boxShadow: [BoxShadow(color: context.isDark ? Colors.black : const Color(0x33000000), offset: const Offset(2, 2), blurRadius: 0)]),
                 child: FilledButton(
                   onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => AddEpicsToListScreen(list: list))),
-                  child: const Text('ДОБАВИТЬ'),
+                  child: Text('add'.tr().toUpperCase()),
                 ),
               ),
             ],
@@ -355,14 +388,14 @@ class _EpicTile extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(epic.title, style: AppTheme.body(size: 13, weight: FontWeight.w600, color: isDone ? AppTheme.ok : context.pxFg,)), // Упрощено
+                  Text(epic.title, style: AppTheme.body(size: 13, weight: FontWeight.w600, color: isDone ? AppTheme.ok : context.pxFg)),
                   if (epic.description.isNotEmpty) ...[
                     const SizedBox(height: 2),
                     Text(epic.description, maxLines: 2, overflow: TextOverflow.ellipsis, style: AppTheme.body(size: 11, color: isDone ? AppTheme.okDim : context.pxMuted)),
                   ],
                   if (isDone && epic.completedAt != null) ...[
                     const SizedBox(height: 2),
-                    Text('готово ${_formatDate(epic.completedAt!)}', style: AppTheme.body(size: 10, color: AppTheme.ok)),
+                    Text('done'.tr(args: [_formatDate(epic.completedAt!)]), style: AppTheme.body(size: 10, color: AppTheme.ok)),
                   ],
                 ],
               ),
@@ -378,11 +411,11 @@ class _EpicTile extends StatelessWidget {
                   final confirmed = await showDialog<bool>(
                     context: context,
                     builder: (ctx) => AlertDialog(
-                      title: Text('Удалить эпик?', style: AppTheme.pixelTitle(color: context.pxFg, size: 10)),
-                      content: Text('Эпик «${epic.title}» будет удалён из всех списков безвозвратно.', style: AppTheme.body(size: 13)),
+                      title: Text('delete_epic'.tr(), style: AppTheme.pixelTitle(color: context.pxFg, size: 10)),
+                      content: Text('delete_epic_confirm'.tr(args: [epic.title]), style: AppTheme.body(size: 13)),
                       actions: [
-                        TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Отмена')),
-                        FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Удалить')),
+                        TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text('cancel'.tr())),
+                        FilledButton(onPressed: () => Navigator.pop(ctx, true), child: Text('delete'.tr())),
                       ],
                     ),
                   );
@@ -390,10 +423,42 @@ class _EpicTile extends StatelessWidget {
                 }
               },
               itemBuilder: (context) => [
-                PopupMenuItem(value: 'toggle', child: ListTile(dense: true, leading: Icon(isDone ? Icons.undo_rounded : Icons.check_circle_outline_rounded, color: isDone ? context.pxMuted : AppTheme.ok, size: 18), title: Text(isDone ? 'Снять отметку' : 'Выполнено', style: AppTheme.body(size: 12)), contentPadding: EdgeInsets.zero)),
-                const PopupMenuItem(value: 'edit', child: ListTile(dense: true, leading: Icon(Icons.edit_rounded, size: 18), title: Text('Редактировать', style: TextStyle(fontSize: 12)), contentPadding: EdgeInsets.zero)),
-                const PopupMenuItem(value: 'remove', child: ListTile(dense: true, leading: Icon(Icons.remove_circle_outline_rounded, size: 18), title: Text('Убрать из списка', style: TextStyle(fontSize: 12)), contentPadding: EdgeInsets.zero)),
-                const PopupMenuItem(value: 'delete', child: ListTile(dense: true, leading: Icon(Icons.delete_outline_rounded, color: AppTheme.danger, size: 18), title: Text('Удалить навсегда', style: TextStyle(color: AppTheme.danger, fontSize: 12)), contentPadding: EdgeInsets.zero)),
+                PopupMenuItem(
+                  value: 'toggle',
+                  child: ListTile(
+                    dense: true,
+                    leading: Icon(isDone ? Icons.undo_rounded : Icons.check_circle_outline_rounded, color: isDone ? context.pxMuted : AppTheme.ok, size: 18),
+                    title: Text(isDone ? 'undo'.tr() : 'mark_done'.tr(), style: AppTheme.body(size: 12)),
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'edit',
+                  child: ListTile(
+                    dense: true,
+                    leading: const Icon(Icons.edit_rounded, size: 18),
+                    title: Text('edit'.tr(), style: const TextStyle(fontSize: 12)),
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'remove',
+                  child: ListTile(
+                    dense: true,
+                    leading: const Icon(Icons.remove_circle_outline_rounded, size: 18),
+                    title: Text('remove_from_list'.tr(), style: const TextStyle(fontSize: 12)),
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'delete',
+                  child: ListTile(
+                    dense: true,
+                    leading: const Icon(Icons.delete_outline_rounded, color: AppTheme.danger, size: 18),
+                    title: Text('delete_forever'.tr(), style: const TextStyle(color: AppTheme.danger, fontSize: 12)),
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                ),
               ],
             ),
           ],

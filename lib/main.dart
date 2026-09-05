@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'core/providers/app_provider.dart';
 import 'core/providers/theme_provider.dart';
 import 'core/theme/app_theme.dart';
@@ -11,9 +12,13 @@ import 'features/home/home_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Инициализация Hive
   await Hive.initFlutter();
   Hive.registerAdapter(EpicAdapter());
   Hive.registerAdapter(DisplayListAdapter());
+
+  // Инициализация локализации (ОБЯЗАТЕЛЬНО до runApp)
+  await EasyLocalization.ensureInitialized();
 
   final themeProvider = ThemeProvider();
   await themeProvider.init();
@@ -22,12 +27,23 @@ void main() async {
   await appProvider.init();
 
   runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider.value(value: themeProvider),
-        ChangeNotifierProvider.value(value: appProvider),
+    EasyLocalization(
+      supportedLocales: const [
+        Locale('ru'),
+        Locale('en'),
       ],
-      child: const EpicListsApp(),
+      path: 'assets/translations',
+      fallbackLocale: const Locale('en'),
+      startLocale: const Locale('ru'),
+      saveLocale: true, // запоминает выбор пользователя
+      useOnlyLangCode: true, // использует только код языка (ru, en)
+      child: MultiProvider(
+        providers: [
+          ChangeNotifierProvider.value(value: themeProvider),
+          ChangeNotifierProvider.value(value: appProvider),
+        ],
+        child: const EpicListsApp(),
+      ),
     ),
   );
 }
@@ -45,6 +61,10 @@ class EpicListsApp extends StatelessWidget {
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       themeMode: themeProvider.themeMode,
+      // Локализация
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: context.locale,
       home: const HomeScreen(),
     );
   }

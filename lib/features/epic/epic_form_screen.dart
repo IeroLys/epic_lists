@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:provider/provider.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../core/providers/app_provider.dart';
 import '../../core/theme/app_theme.dart';
 import '../../data/models/epic.dart';
@@ -74,7 +75,7 @@ class _EpicFormScreenState extends State<EpicFormScreen> {
       builder: (ctx) {
         Color temp = _color;
         return AlertDialog(
-          title: Text('Цвет флага', style: AppTheme.pixelTitle(color: context.pxFg, size: 10)),
+          title: Text('flag_color'.tr(), style: AppTheme.pixelTitle(color: context.pxFg, size: 10)),
           content: SingleChildScrollView(
             child: BlockPicker(
               pickerColor: _color,
@@ -88,8 +89,17 @@ class _EpicFormScreenState extends State<EpicFormScreen> {
             ),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Отмена')),
-            FilledButton(onPressed: () { setState(() => _color = temp); Navigator.pop(ctx); }, child: const Text('Выбрать')),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx), 
+              child: Text('cancel'.tr()),
+            ),
+            FilledButton(
+              onPressed: () { 
+                setState(() => _color = temp); 
+                Navigator.pop(ctx); 
+              }, 
+              child: Text('select'.tr()),
+            ),
           ],
         );
       },
@@ -106,7 +116,10 @@ class _EpicFormScreenState extends State<EpicFormScreen> {
     return Scaffold(
       backgroundColor: context.pxBg,
       appBar: AppBar(
-        title: Text(isEditing ? 'ПРАВИТЬ ЭПИК' : 'НОВЫЙ ЭПИК', style: AppTheme.pixelTitle(color: context.pxFg, size: 10)),
+        title: Text(
+          isEditing ? 'edit_epic'.tr() : 'new_epic'.tr(), 
+          style: AppTheme.pixelTitle(color: context.pxFg, size: 10),
+        ),
         actions: [
           Container(
             margin: const EdgeInsets.only(right: 12),
@@ -128,20 +141,27 @@ class _EpicFormScreenState extends State<EpicFormScreen> {
         key: _formKey,
         child: ListView(
           padding: EdgeInsets.only(
-      left: 20,
-      right: 20,
-      top: 20,
-      bottom: MediaQuery.of(context).padding.bottom + 100, // + отступ для Android навигации
-    ),
+            left: 20,
+            right: 20,
+            top: 20,
+            bottom: MediaQuery.of(context).padding.bottom + 100,
+          ),
           children: [
             Center(
               child: GestureDetector(
                 onTap: emoji.isEmpty ? _pickColor : null,
                 child: Column(
                   children: [
-                    if (emoji.isNotEmpty) Text(emoji, style: const TextStyle(fontSize: 48)) else PixelFlag(color: _color, size: 56),
+                    if (emoji.isNotEmpty) 
+                      Text(emoji, style: const TextStyle(fontSize: 48)) 
+                    else 
+                      PixelFlag(color: _color, size: 56),
                     const SizedBox(height: 8),
-                    Text(emoji.isNotEmpty ? 'Эмодзи вместо флага' : 'Нажми на флаг, чтобы сменить цвет', style: AppTheme.body(size: 12, color: context.pxSubtle), textAlign: TextAlign.center),
+                    Text(
+                      emoji.isNotEmpty ? 'emoji_instead_of_flag'.tr() : 'tap_flag_to_change_color'.tr(), 
+                      style: AppTheme.body(size: 12, color: context.pxSubtle), 
+                      textAlign: TextAlign.center,
+                    ),
                   ],
                 ),
               ),
@@ -149,7 +169,10 @@ class _EpicFormScreenState extends State<EpicFormScreen> {
             const SizedBox(height: 24),
             TextFormField(
               controller: _emojiCtrl,
-              decoration: const InputDecoration(labelText: 'Эмодзи (необязательно)', prefixIcon: Icon(Icons.emoji_emotions_outlined, size: 20)),
+              decoration: InputDecoration(
+                labelText: 'emoji_optional'.tr(), 
+                prefixIcon: const Icon(Icons.emoji_emotions_outlined, size: 20),
+              ),
               onChanged: (_) => setState(() {}),
             ),
             const SizedBox(height: 16),
@@ -157,14 +180,24 @@ class _EpicFormScreenState extends State<EpicFormScreen> {
               Align(
                 alignment: Alignment.centerLeft,
                 child: Container(
-                  decoration: BoxDecoration(border: Border.all(color: context.pxLine, width: 2), boxShadow: [BoxShadow(color: context.isDark ? Colors.black : const Color(0x33000000), offset: const Offset(2, 2))]),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: context.pxLine, width: 2), 
+                    boxShadow: [BoxShadow(color: context.isDark ? Colors.black : const Color(0x33000000), offset: const Offset(2, 2))]
+                  ),
                   child: Material(
                     color: context.pxPanel,
                     child: InkWell(
                       onTap: _pickColor,
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                        child: Row(mainAxisSize: MainAxisSize.min, children: [const Icon(Icons.palette_outlined, size: 16), const SizedBox(width: 8), Text('Цвет флага', style: AppTheme.body(size: 12))]),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min, 
+                          children: [
+                            const Icon(Icons.palette_outlined, size: 16), 
+                            const SizedBox(width: 8), 
+                            Text('flag_color'.tr(), style: AppTheme.body(size: 12))
+                          ]
+                        ),
                       ),
                     ),
                   ),
@@ -173,14 +206,21 @@ class _EpicFormScreenState extends State<EpicFormScreen> {
             const SizedBox(height: 16),
             TextFormField(
               controller: _titleCtrl,
-              decoration: const InputDecoration(labelText: 'Название эпика', prefixIcon: Icon(Icons.title, size: 20)),
+              decoration: InputDecoration(
+                labelText: 'epic_title'.tr(), 
+                prefixIcon: const Icon(Icons.title, size: 20),
+              ),
               textCapitalization: TextCapitalization.sentences,
-              validator: (v) => (v == null || v.trim().isEmpty) ? 'Введите название' : null,
+              validator: (v) => (v == null || v.trim().isEmpty) ? 'enter_title'.tr() : null,
             ),
             const SizedBox(height: 16),
             TextFormField(
               controller: _descCtrl,
-              decoration: const InputDecoration(labelText: 'Описание (необязательно)', prefixIcon: Icon(Icons.notes, size: 20), alignLabelWithHint: true),
+              decoration: InputDecoration(
+                labelText: 'description_optional'.tr(), 
+                prefixIcon: const Icon(Icons.notes, size: 20), 
+                alignLabelWithHint: true,
+              ),
               maxLines: 4,
               textCapitalization: TextCapitalization.sentences,
             ),
@@ -190,18 +230,28 @@ class _EpicFormScreenState extends State<EpicFormScreen> {
                 value: _addToCurrentList,
                 onChanged: (v) => setState(() => _addToCurrentList = v ?? true),
                 activeColor: AppTheme.accent,
-                title: Text(currentListName != null ? 'Добавить в «$currentListName»' : 'Добавить в текущий список', style: AppTheme.body(size: 13)),
+                title: Text(
+                  currentListName != null 
+                      ? 'add_to_list'.tr(args: [currentListName]) 
+                      : 'add_to_current_list'.tr(), 
+                  style: AppTheme.body(size: 13),
+                ),
                 controlAffinity: ListTileControlAffinity.leading,
                 contentPadding: EdgeInsets.zero,
               ),
             ],
             const SizedBox(height: 28),
             Container(
-              decoration: BoxDecoration(boxShadow: [BoxShadow(color: context.isDark ? Colors.black : const Color(0x33000000), offset: const Offset(2, 2), blurRadius: 0)]),
+              decoration: BoxDecoration(
+                boxShadow: [BoxShadow(color: context.isDark ? Colors.black : const Color(0x33000000), offset: const Offset(2, 2), blurRadius: 0)],
+              ),
               child: FilledButton(
                 onPressed: _save,
                 style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(48)),
-                child: Text(isEditing ? 'СОХРАНИТЬ' : 'СОЗДАТЬ', style: AppTheme.pixelSmall(color: const Color(0xFFE8B896))),
+                child: Text(
+                  isEditing ? 'save'.tr() : 'create'.tr(), 
+                  style: AppTheme.pixelSmall(color: const Color(0xFFE8B896)),
+                ),
               ),
             ),
           ],
